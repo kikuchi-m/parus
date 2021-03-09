@@ -14,9 +14,7 @@ SCOPES = [
 
 
 class TestGetCredentials:
-
     class TestValidCredentials:
-
         def test_from_default(self, tmpdir, google_auth_api, parus_config):
             valid_creds = google_auth_api.mock_credentials(valid=True)
             load_creds = google_auth_api.mock_load_credentials(credentials=valid_creds)
@@ -48,7 +46,6 @@ class TestGetCredentials:
             load_creds.assert_called_once_with(token_file, SCOPES)
 
     class TestRefreshToken:
-
         def test_refresh(self, tmpdir, google_auth_api, parus_config):
             parus_config.mock_default_credentials_ang_token(tmpdir)
 
@@ -83,7 +80,6 @@ class TestGetCredentials:
                 assert fp.read() == 'token json'
 
     class TestCreateNewToken:
-
         def test_when_unrefreshable(self, tmpdir, google_auth_api, parus_config):
             invalid_creds_file, token_file, _, _ = parus_config.mock_default_credentials_ang_token(tmpdir)
 
@@ -129,7 +125,6 @@ class TestGetCredentials:
                 assert fp.read() == 'new token json'
 
     class TestError:
-
         def test_when_default_credentials_file_not_found(self, tmpdir, parus_config):
             creds_file, _, _, _ = parus_config.mock_default_credentials_ang_token(tmpdir, create_creds=False)
 
@@ -183,41 +178,3 @@ def google_auth_api(mocker):
             return creds
 
     return GoogleAuthApiMocker(mocker)
-
-
-@pytest.fixture
-def parus_config(mocker):
-    @dataclass
-    class ParusConfig:
-        mocker: Any
-
-        def mock_get_default_credentials_file(self, credentials_file=None):
-            return self.mocker.patch('parus.auth.get_default_credentials_file', return_value=credentials_file)
-
-        def mock_token_file_for(self, token_file=None):
-            return self.mocker.patch('parus.auth.token_file_for', return_value=token_file)
-
-        def mock_default_credentials_ang_token(self, home_dir, create_creds=True, create_token=True):
-            parus_dir = pathlib.Path(home_dir, '.parus')
-            creds_file, token_file = self.set_up_creds_files(
-                parus_dir, create_creds=create_creds, create_token=create_token)
-            return (
-                creds_file,
-                token_file,
-                self.mock_get_default_credentials_file(creds_file),
-                self.mock_token_file_for(token_file),
-            )
-
-        def set_up_creds_files(self, directory, create_creds=False, create_token=False):
-            directory.mkdir(exist_ok=True)
-            creds_file = directory / 'creds.json'
-            token_file = directory / 'token.json'
-            if create_creds:
-                with open(creds_file, 'w'):
-                    pass
-            if create_token:
-                with open(token_file, 'w'):
-                    pass
-            return creds_file, token_file
-
-    return ParusConfig(mocker)
