@@ -9,7 +9,7 @@ import parus.config as config
 @pytest.fixture
 def parus_config(mocker):
     @dataclass
-    class ParusConfig:
+    class ParusConfigMocker:
         mocker: Any
 
         def mock_get_default_credentials_file(self, credentials_file=None):
@@ -65,4 +65,7 @@ def parus_config(mocker):
             parus_dir.mkdir(parents=True, exist_ok=True)
             return parus_dir
 
-    return ParusConfig(mocker)
+        def mock_get_default_folder_id(self, mod, folder_id=None):
+            return self.mocker.patch(f'{mod}.get_default_folder_id', return_value=folder_id)
+
+    return ParusConfigMocker(mocker)
