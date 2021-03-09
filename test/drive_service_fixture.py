@@ -24,6 +24,16 @@ def google_drive_api(mocker):
             self.mocker.patch.object(df, 'create', return_value=req)
             return req
 
+        def mock_drive_files_update(self, df, file_id='file-id', name='file-name'):
+            res = {
+                'id': file_id,
+                'name': name,
+            }
+            req = self.mocker.Mock()
+            self.mocker.patch.object(req, 'execute', return_value=res)
+            self.mocker.patch.object(df, 'update', return_value=req)
+            return req
+
         def dummy_credentials(self):
             return self.mocker.Mock()
 
