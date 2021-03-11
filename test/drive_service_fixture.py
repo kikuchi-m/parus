@@ -56,6 +56,7 @@ def google_drive_api(mocker):
             'id': f'{i}',
             'name': f'name-{i}',
             'mimeType': f'mime-{i}',
+            'trashed': False,
         } for i in range(3)]
 
         @property

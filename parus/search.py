@@ -1,6 +1,6 @@
 from parus.google import build_google_drive_service
 
-FIELDS = 'files(id, name, mimeType), nextPageToken'
+FIELDS = 'files(id, name, mimeType, trashed), nextPageToken'
 
 
 def search_files(credentials, query=None, max_size=50, paging=False, page_size=20):
@@ -15,7 +15,7 @@ def search_files(credentials, query=None, max_size=50, paging=False, page_size=2
             res = drive_files.list(q=query, pageSize=ps, pageToken=token, fields=FIELDS).execute()
             files = res.get('files', [])
             for f in files:
-                print(f"{f['name']} ({f.get('mimeType', 'unknown')}): {f['id']}")
+                print(f"{f['name']} ({f.get('mimeType', 'unknown')}{', trashed' if f['trashed'] else ''}): {f['id']}")
             token = res.get('nextPageToken', None)
             cont = token is not None
             while cont:

@@ -17,7 +17,7 @@ class TestSearchFiles:
         build_drive_service.assert_called_once_with(c)
         drive_service.files.assert_called_once()
         drive_files.list.assert_called_once_with(
-            q=None, pageSize=50, pageToken=None, fields='files(id, name, mimeType), nextPageToken')
+            q=None, pageSize=50, pageToken=None, fields='files(id, name, mimeType, trashed), nextPageToken')
         req.execute.assert_called_once()
 
     def test_search_with_query(self, google_drive_api):
