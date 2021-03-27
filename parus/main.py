@@ -8,7 +8,7 @@ from parus.update import update_file
 
 def main(argv):
     p = argparse.ArgumentParser(prog='parus')
-    subp = p.add_subparsers(dest='command')
+    subp = p.add_subparsers(dest='command', required=True)
 
     search = subp.add_parser('search')
     _credentials_arg(search)
