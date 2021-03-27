@@ -1,4 +1,5 @@
 import argparse
+import sys
 
 from parus.auth import get_credentials
 from parus.search import search_files
@@ -47,3 +48,7 @@ def main(argv):
 
 def _credentials_arg(p):
     p.add_argument('--credentials', help='Path of credentials json.')
+
+
+def entry_point():
+    sys.exit(main(sys.argv[1:]))

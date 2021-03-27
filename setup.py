@@ -23,7 +23,7 @@ setuptools.setup(
     ],
     packages=setuptools.find_packages(),
     entry_points={
-        'console_scripts': ['parus = parus.__main__'],
+        'console_scripts': ['parus = parus.main:entry_point'],
     },
     url='https://github.com/kikuchi-m/parus',
     author='Kikuchi Motoki',
