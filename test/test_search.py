@@ -1,3 +1,5 @@
+import pytest
+
 from unittest.mock import patch
 
 from parus.search import search_files
@@ -111,6 +113,31 @@ class TestSearchFiles:
         drive_files.list.assert_called_once()
         assert len(input_mock.mock_calls) == 2
 
+    @pytest.mark.parametrize('file_data, expect', [
+        ({'id': 'file-id', 'name': 'file-name', 'mimeType': 'mime/type', 'trashed': False},
+         'file-name (mime/type): file-id'),
+        ({'id': 'file-id', 'name': 'file-name', 'trashed': False},
+         'file-name (unknown): file-id'),
+        ({'id': 'file-id', 'name': 'file-name', 'mimeType': 'mime/type', 'trashed': True},
+         'file-name (mime/type, trashed): file-id'),
+    ])
+    def test_print_result(self, google_drive_api, file_data, expect):
+        c = google_drive_api.dummy_credentials()
+        drive_service, _ = google_drive_api.mock_build_google_drive_service(MODULE)
+        drive_files = google_drive_api.mock_drive_service_files(drive_service)
+        google_drive_api.mock_drive_files_list(drive_files, results=[
+            google_drive_api.drive_files_list_result(files=[file_data]),
+        ])
+
+        with mock_print() as print_mock:
+            search_files(c)
+
+        print_mock.assert_called_once_with(expect)
+
 
 def mock_input(return_values):
     return patch('builtins.input', side_effect=return_values)
+
+
+def mock_print():
+    return patch('builtins.print')
