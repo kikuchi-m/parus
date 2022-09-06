@@ -34,6 +34,11 @@ def google_drive_api(mocker):
             self.mocker.patch.object(df, 'update', return_value=req)
             return req
 
+        def mock_drive_files_get_media(self, df):
+            req = self.mocker.Mock()
+            self.mocker.patch.object(df, 'get_media', return_value=req)
+            return req
+
         def dummy_credentials(self):
             return self.mocker.Mock()
 
@@ -44,6 +49,29 @@ def google_drive_api(mocker):
         def mock_media_file_upload(self, mod):
             mfu = self.mocker.Mock()
             return mfu, self.mocker.patch(f'{mod}.MediaFileUpload', return_value=mfu)
+
+        def mock_media_io_base_download(self, mod, results):
+            class DownloadEffects:
+                def __init__(self, mdl, res):
+                    self.ofp = None
+                    self.mdl = mdl
+                    self.res_iter = iter(res[:])
+
+                def init_effect(self, fp, req):
+                    self.ofp = fp
+                    return self.mdl
+
+                def next_chunk_effect(self):
+                    p, done, b = next(self.res_iter)
+                    self.ofp.write(b)
+                    return p, done
+
+            mdl = self.mocker.Mock()
+            effects = DownloadEffects(mdl, results)
+            mdl_init = self.mocker.patch(f'{mod}.MediaIoBaseDownload', side_effect=effects.init_effect)
+            self.mocker.patch.object(mdl, 'next_chunk', side_effect=effects.next_chunk_effect)
+
+            return mdl, mdl_init
 
         def mock_drive_files_list(self, df, results=None):
             res = results or [self.drive_files_list_result()]

@@ -31,7 +31,7 @@ class TestSearchFiles:
         (['--paging'], search_files_args(paging=True)),
         *[([a, '5'], search_files_args(page_size=5)) for a in ['-p', '--page-size']],
     ])
-    def test_with_args(self, subcommand, credentials, cmd_args, exe_args):
+    def test_execute_command_with_args(self, subcommand, credentials, cmd_args, exe_args):
         main(['search'] + cmd_args)
         subcommand.search_files.assert_called_once_with(**exe_args)
         credentials.assert_called_once_with(None)
@@ -62,7 +62,7 @@ class TestUploadToDrive:
         (['--mime', 'image/png'], upload_to_drive_args(mime='image/png')),
         (['--folder-id', 'folder-to-upload'], upload_to_drive_args(folder_id='folder-to-upload')),
     ])
-    def test_with_args(self, subcommand, credentials, cmd_args, exe_args):
+    def test_execute_command_with_args(self, subcommand, credentials, cmd_args, exe_args):
         main(['upload', DUMMY_FILE] + cmd_args)
         subcommand.upload_to_drive.assert_called_once_with(**exe_args)
         credentials.assert_called_once_with(None)
@@ -72,26 +72,42 @@ class TestUploadToDrive:
         credentials.assert_called_once_with('path/to/credentials')
 
 
-def update_file_args(file=DUMMY_FILE, file_id=DUMMY_FILE_ID, credentials=DUMMY_CREDENTIALS):
-    return {
-        'file': file,
-        'file_id': file_id,
-        'credentials': credentials,
-    }
-
-
 class TestUpdateFile:
     def test_return_zero(self):
         ret = main(['update', 'dummy', '--file-id', DUMMY_FILE_ID])
         assert ret == 0
 
-    def test_with_args(self, subcommand, credentials):
+    def test_execute_command_with_args(self, subcommand, credentials):
         main(['update', DUMMY_FILE, '--file-id', DUMMY_FILE_ID])
-        subcommand.update_file.assert_called_once_with(**update_file_args())
+        subcommand.update_file.assert_called_once_with(**{
+            'file': DUMMY_FILE,
+            'file_id': DUMMY_FILE_ID,
+            'credentials': DUMMY_CREDENTIALS,
+        })
         credentials.assert_called_once_with(None)
 
     def test_with_credentials(self, credentials):
         main(['update', DUMMY_FILE, '--file-id', DUMMY_FILE_ID, '--credentials', 'path/to/credentials'])
+        credentials.assert_called_once_with('path/to/credentials')
+
+
+class TestDownloadFile:
+    def test_return_zero(self):
+        ret = main(['download', '--file-id', DUMMY_FILE_ID, '--output-file', DUMMY_FILE])
+        assert ret == 0
+
+    @pytest.mark.parametrize('o_opt_name', ['--output-file', '-o'])
+    def test_execute_command_with_args(self, o_opt_name, subcommand, credentials):
+        main(['download', '--file-id', DUMMY_FILE_ID, o_opt_name, DUMMY_FILE])
+        subcommand.download_file.assert_called_once_with(**{
+            'file_id': DUMMY_FILE_ID,
+            'output_file': DUMMY_FILE,
+            'credentials': DUMMY_CREDENTIALS,
+        })
+        credentials.assert_called_once_with(None)
+
+    def test_with_credentials(self, credentials):
+        main(['download', '--credentials', 'path/to/credentials', '--file-id', DUMMY_FILE_ID, '--output', DUMMY_FILE])
         credentials.assert_called_once_with('path/to/credentials')
 
 
@@ -107,8 +123,10 @@ def subcommand(mocker):
         search_files: Mock
         upload_to_drive: Mock
         update_file: Mock
+        download_file: Mock
 
     return Subcommands(
         mocker.patch('parus.main.search_files'),
         mocker.patch('parus.main.upload_to_drive'),
-        mocker.patch('parus.main.update_file'))
+        mocker.patch('parus.main.update_file'),
+        mocker.patch('parus.main.download_file'))
