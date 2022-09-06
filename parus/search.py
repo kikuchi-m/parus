@@ -1,10 +1,11 @@
 from parus.google import build_google_drive_service
 
 FIELDS = 'files(id, name, mimeType, trashed), nextPageToken'
+SEARCH_HELP = 'See for query: https://developers.google.com/drive/api/v3/search-files'
 
 
 def search_files(credentials, query=None, max_size=50, paging=False, page_size=20):
-    '''See for query: https://developers.google.com/drive/api/v3/search-files
+    f'''{SEARCH_HELP}
     '''
     drive_service = build_google_drive_service(credentials)
     with drive_service.files() as drive_files:

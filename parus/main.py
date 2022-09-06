@@ -2,9 +2,9 @@ import argparse
 import sys
 
 from parus.auth import get_credentials
-from parus.search import search_files
-from parus.upload import upload_to_drive
+from parus.search import SEARCH_HELP, search_files
 from parus.update import update_file
+from parus.upload import upload_to_drive
 
 
 def main(argv):
@@ -13,7 +13,8 @@ def main(argv):
 
     search = subp.add_parser('search')
     _credentials_arg(search)
-    search.add_argument('-q', '--query')
+    search.add_argument('-q', '--query',
+                        help=SEARCH_HELP)
     search.add_argument('--max-size', type=int, default=50)
     search.add_argument('--paging', action='store_true')
     search.add_argument('-p', '--page-size', type=int, default=20)
