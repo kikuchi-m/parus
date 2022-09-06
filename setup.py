@@ -17,9 +17,9 @@ setuptools.setup(
     version=read_version(),
     python_requires='>=3.7.5',
     install_requires=[
-        'google-api-python-client>=1.12.8',
-        'google-auth-httplib2>=0.0.4',
-        'google-auth-oauthlib>=0.4.2',
+        'google-api-python-client>=2.58.0',
+        'google-auth-httplib2>=0.1.0',
+        'google-auth-oauthlib>=0.5.2',
     ],
     packages=setuptools.find_packages(),
     entry_points={
