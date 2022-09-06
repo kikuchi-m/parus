@@ -10,6 +10,7 @@ from parus.config import get_default_credentials_file, token_file_for
 SCOPES = [
     # https://developers.google.com/identity/protocols/oauth2/scopes#drive
     'https://www.googleapis.com/auth/drive.file',
+    'https://www.googleapis.com/auth/drive.readonly',
     'https://www.googleapis.com/auth/drive.metadata.readonly',
 ]
 _FLOW_SERVER_PORT = 0
